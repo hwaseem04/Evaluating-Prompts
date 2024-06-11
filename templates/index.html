@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Optimizing Prompts
+        </title>
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <link rel="stylesheet" href="static/styles.css">
+        <script>
+            function showAlert() {
+                var alertBox = document.getElementById('alertBox');
+                alertBox.style.display = 'block';
+                setTimeout(function() {
+                    alertBox.style.display = 'none';
+                }, 3000);  // Clear the alert after 3 seconds
+            }
+        </script>
+    </head>
+    <body>
+        <div id="header">
+            <div id="title">
+                <h4>Optimizing Prompts</h4>
+            </div>
+        </div>
+        <div id="main">
+            <div class="partition">
+                <h3 class="partition-title">Prompt using Principle {{ pid }}. Question #{{qid}} </h3>
+                <div class="scrollable-text">{{ partition_texts.partition1 }}</div>
+            </div>
+            <div class="partition">
+                <h3 class="partition-title">Prompt without Principle {{ pid }}. Question #{{qid}} </h3>
+                <div class="scrollable-text">{{ partition_texts.partition2 }}</div>
+            </div>
+            <div class="partition">
+                <h3 class="partition-title">Response</h3>
+                <div class="scrollable-text">{{ partition_texts.partition3 | safe }}</div>
+            </div>
+            <div class="partition">
+                <h3 class="partition-title">Response</h3>
+                <div class="scrollable-text">{{ partition_texts.partition4 | safe }}</div>
+            </div>
+        </div>
+        <div id="preference">
+            {% if preference and justification %}
+                <div>
+                    <strong>Preference:</strong> {{ preference }}<br>
+                    <strong>Justification:</strong> {{ justification }}
+                </div>
+            {% endif %}
+        </div>
+        <div id="options">
+            <form method="POST" action="{{ url_for('login') }}">
+                <button type="submit" name="getPref" class="option-button">Get Preference</button>
+                <button type="submit" name="changePref" class="option-button">Change Preference</button>
+                <button type="submit" name="getCorr" class="option-button">Get Correctness</button>
+                <button type="submit" name="changeCorr" class="option-button">Change Correctness</button>
+                <button type="submit" name="prev" class="option-button">Previous</button>
+                <button type="submit" name="next" class="option-button">Next</button>
+                <button type="submit" name="save" class="option-button">Save</button>
+                <!-- <button type="submit" name="flag" class="option-button">Flag</button> -->
+            </form>
+        </div>
+        <div id="alertBox" class="alert-box" style="display: none;">
+            Preference saved successfully!
+        </div>
+        {% if alert %}
+            <script>
+                showAlert();
+            </script>
+        {% endif %}
+    </body>
+</html>
