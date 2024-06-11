@@ -29,3 +29,7 @@ CREATE TABLE IF NOT EXISTS principle{i} (
 ### To run flask application
 - Ensure you are in root directory of this repository.
 - `python app.py`
+- Now open the local host link, usually - ` http://127.0.0.1:5000`
+
+### Bug tracking
+- You can either text me in teams or (Most preferred)you can raise an issue in this repository along with steps to reproduce the bug. 
