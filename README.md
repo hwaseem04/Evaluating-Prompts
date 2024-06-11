@@ -1,5 +1,8 @@
 # Evaluating-Prompts
 
+### Clone the repo locally
+- `git clone https://github.com/hwaseem04/Evaluating-Prompts`
+
 ### To create table for each principle from json files
 - Download all the json files. For testing you can start with just two files, i.e [w_principle_1.json](misc/json_files/w_principle_1.json) and [wo_principle_1.json](misc/json_files/wo_principle_1.json)
 - Run this [jupyter file](misc/create_db.ipynb). You will have your table(`principle1`) generated for principle 1 in this [database](misc/DBs/principles.db)
