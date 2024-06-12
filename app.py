@@ -15,7 +15,7 @@ def get_all_rows():
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     rows = []
-    for i in range(1, 2): #TODO: Change to full range
+    for i in range(1, 27): #TODO: Change to full range
         table_name = f'principle{i}'
         c.execute(f'SELECT * FROM {table_name}')
         rows.extend(c.fetchall())
