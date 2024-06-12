@@ -60,7 +60,7 @@ def generate_preference(res1, res2): # TODO
     res = get_openai_response(prompt)
     print(res)
 
-    preference = res[0]
+    preference = int(res[0])
     justification = res[1:]
     return preference, justification
 
