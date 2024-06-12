@@ -58,7 +58,7 @@ def generate_preference(res1, res2): # TODO
 
     prompt = create_chat_prompt(res1, res2)
     res = get_openai_response(prompt)
-    print(res)
+    # print(res)
 
     preference = int(res[0])
     justification = res[1:]
@@ -105,7 +105,14 @@ def login():
             session['index'] += 1
             if session['index'] >= len(rows):
                 session['index'] = 0  # Reset to the first row if there are no more rows
-            if 'preference' in session:
+            
+            principle_id = rows[session['index']][0]   # Get the current principle_id
+            questions_id = rows[session['index']][1]   # Get the current question_id
+            existing_preference = get_preference(principle_id, questions_id)
+            if existing_preference is not None:
+                session['preference'] = int(existing_preference)
+                session['justification'] = 'Loaded from database'
+            elif 'preference' in session:
                 del session['preference']
                 del session['justification']
         
@@ -113,7 +120,13 @@ def login():
             session['index'] -= 1
             if session['index'] < 0:
                 session['index'] = len(rows) - 1  # Go to the last row if the index goes below 0
-            if 'preference' in session:
+            principle_id = rows[session['index']][0]   # Get the current principle_id
+            questions_id = rows[session['index']][1]   # Get the current question_id
+            existing_preference = get_preference(principle_id, questions_id)
+            if existing_preference is not None:
+                session['preference'] = int(existing_preference)
+                session['justification'] = 'Loaded from database'
+            elif 'preference' in session:
                 del session['preference']
                 del session['justification']
         
@@ -156,8 +169,8 @@ def login():
                 principle_id = rows[session['index']][0]  
                 questions_id = rows[session['index']][1]  
                 save_preference(principle_id, questions_id, session['preference'])
-                del session['preference']
-                del session['justification']
+                # del session['preference']
+                # del session['justification']
                 alert = True
     
     row = rows[session['index']] if rows else ('No data', 'No data', 'No data', 'No data')
