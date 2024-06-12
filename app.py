@@ -30,13 +30,10 @@ def get_correctness(principle_id, questions_id):
     #TODO: Code to get the most appropriate response if present in the database already
     return 1
 
-def create_chat_prompt(question, res1, res2):
-    if len(question.split(' ')) < 3:
-        return ''
-    sys_msg = """Choose the better response for the question. The first character of the response must be 1 for response 1 or 2 for response 2. After the first character, give a brief justification for your choice."""
-    user_prompt = f"""QUESTION: {question}
-Response 1: {res1}
-Response 2: {res2} """
+def create_chat_prompt(res1, res2):
+    sys_msg = """Choose the better-written option. The first character of your response must be 1 for response 1 or 2 for response 2. After the first character, give a brief justification for your choice."""
+    user_prompt = f"""Option 1: {res1}
+                    Option 2: {res2} """
     
     return [
         {"role": "system", "content": sys_msg}, 
@@ -57,9 +54,9 @@ def get_openai_response(prompt):
             time.sleep(3)
     print(f"Failed to get chat completion after {max_retries} attempts")
 
-def generate_preference(question, res1, res2): # TODO
+def generate_preference(res1, res2): # TODO
 
-    prompt = create_chat_prompt(question, res1, res2)
+    prompt = create_chat_prompt(res1, res2)
     res = get_openai_response(prompt)
     print(res)
 
@@ -123,8 +120,8 @@ def login():
         elif 'getPref' in request.form:
             response1 = rows[session['index']][4]
             response2 = rows[session['index']][5]
-            question = rows[session['index']][2]
-            preference, justification = generate_preference(question, response1, response2)
+
+            preference, justification = generate_preference( response1, response2)
             session['preference'] = preference
             session['justification'] = justification
         
