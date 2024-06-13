@@ -58,7 +58,6 @@ def generate_preference(res1, res2): # TODO
 
     prompt = create_chat_prompt(res1, res2)
     res = get_openai_response(prompt)
-    # print(res)
 
     preference = int(res[0])
     justification = res[1:]
@@ -70,8 +69,6 @@ def get_preference(principle_id, questions_id):
     table_name = f'principle{principle_id}'
     c.execute(f"SELECT preference FROM {table_name} WHERE qid=?", (questions_id,))
     result = c.fetchone()
-    c.execute(f"UPDATE {table_name} SET preference = ? WHERE qid = ?", ('', questions_id))
-    conn.commit()
     conn.close()
     if result is None or result[0] == '':
         return None
@@ -82,7 +79,8 @@ def save_preference(principle_id, questions_id, preference,):
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     table_name = f'principle{principle_id}'
-    c.execute(f"UPDATE {table_name} SET preference = ? WHERE qid = ?", (preference, questions_id))
+    print(type(preference), preference)
+    c.execute(f"UPDATE {table_name} SET preference=? WHERE qid=?", (preference, questions_id))
     conn.commit()
     conn.close()
 
@@ -169,6 +167,7 @@ def login():
                 principle_id = rows[session['index']][0]  
                 questions_id = rows[session['index']][1]  
                 save_preference(principle_id, questions_id, session['preference'])
+                print("saved")
                 # del session['preference']
                 # del session['justification']
                 alert = True
