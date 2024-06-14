@@ -17,7 +17,11 @@ CREATE TABLE IF NOT EXISTS principle{i} (
     without_principle TEXT,
     response_with_principle TEXT,
     response_without_principle TEXT,
-    preference TEXT
+    human_preference INT,
+    machine_preference INT,
+    correctness_gpt3_5turbo INT,
+    correctness_gpt4 INT,
+    correctness_gpt4o INT
 )
 ```
 

@@ -67,20 +67,25 @@ def get_preference(principle_id, questions_id):
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     table_name = f'principle{principle_id}'
-    c.execute(f"SELECT preference FROM {table_name} WHERE qid=?", (questions_id,))
-    result = c.fetchone()
+    c.execute(f"SELECT human_preference FROM {table_name} WHERE qid=?", (questions_id,))
+    result1 = c.fetchone()
+    c.execute(f"SELECT machine_preference FROM {table_name} WHERE qid=?", (questions_id,))
+    result2 = c.fetchone()
     conn.close()
-    if result is None or result[0] == '':
-        return None
-    else:
-        return int(result[0])
+    
+    tup = [None, None]
+    print(type(result1[0]), type(result2[0]))
+    if isinstance(result1[0], int):
+        tup[0] = result1[0]
+    if isinstance(result2[0], int):
+        tup[1] = result2[0]
+    return tup
 
-def save_preference(principle_id, questions_id, preference,):
+def save_preference(principle_id, questions_id, preference, type='human'):
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     table_name = f'principle{principle_id}'
-    print(type(preference), preference)
-    c.execute(f"UPDATE {table_name} SET preference=? WHERE qid=?", (preference, questions_id))
+    c.execute(f"UPDATE {table_name} SET {type}_preference=? WHERE qid=?", (preference, questions_id))
     conn.commit()
     conn.close()
 
@@ -106,13 +111,10 @@ def login():
             
             principle_id = rows[session['index']][0]   # Get the current principle_id
             questions_id = rows[session['index']][1]   # Get the current question_id
-            existing_preference = get_preference(principle_id, questions_id)
-            if existing_preference is not None:
-                session['preference'] = int(existing_preference)
-                session['justification'] = 'Loaded from database'
-            elif 'preference' in session:
-                del session['preference']
-                del session['justification']
+            existing_human_preference, existing_machine_preference = get_preference(principle_id, questions_id)
+            session['machine_preference'] = existing_machine_preference
+            session['preference'] = existing_human_preference
+            session['justification'] = 'Loaded from database'
         
         elif 'prev' in request.form:
             session['index'] -= 1
@@ -120,33 +122,38 @@ def login():
                 session['index'] = len(rows) - 1  # Go to the last row if the index goes below 0
             principle_id = rows[session['index']][0]   # Get the current principle_id
             questions_id = rows[session['index']][1]   # Get the current question_id
-            existing_preference = get_preference(principle_id, questions_id)
-            if existing_preference is not None:
-                session['preference'] = int(existing_preference)
-                session['justification'] = 'Loaded from database'
-            elif 'preference' in session:
-                del session['preference']
-                del session['justification']
+            existing_human_preference, existing_machine_preference = get_preference(principle_id, questions_id)
+            
+            session['machine_preference'] = existing_machine_preference
+            session['preference'] = existing_human_preference
+            session['justification'] = 'Loaded from database'
         
         elif 'getPref' in request.form:
             response1 = rows[session['index']][4]
             response2 = rows[session['index']][5]
 
-            preference, justification = generate_preference( response1, response2)
-            session['preference'] = preference
+            principle_id = rows[session['index']][0]  
+            questions_id = rows[session['index']][1] 
+
+            preference, justification = generate_preference(response1, response2)
+            save_preference(principle_id, questions_id, preference, type='machine')
+
+            print('machine preference :', preference)
+            session['machine_preference'] = preference
             session['justification'] = justification
         
         elif 'changePref' in request.form:
             principle_id = rows[session['index']][0]   # Get the current principle_id
             questions_id = rows[session['index']][1]   # Get the current question_id
-            existing_preference = get_preference(principle_id, questions_id)
+            existing_human_preference, _ = get_preference(principle_id, questions_id)
             # print('pref', existing_preference, type(existing_preference), 'qid :', questions_id)
-            if existing_preference is not None:
-                session['preference'] = 2 if existing_preference == 1 else 1
-                session['justification'] = "Human Preference"
-            elif 'preference' in session:
+            if 'preference' in session:
                 session['preference'] = 2 if session['preference'] == 1 else 1
                 session['justification'] = "Human Preference"
+            elif existing_human_preference is not None:
+                session['preference'] = 2 if existing_human_preference == 1 else 1
+                session['justification'] = "Human Preference"
+            
         
         elif 'getCorr' in request.form:
             response1 = rows[session['index']][4]
@@ -166,8 +173,7 @@ def login():
             if 'preference' in session:
                 principle_id = rows[session['index']][0]  
                 questions_id = rows[session['index']][1]  
-                save_preference(principle_id, questions_id, session['preference'])
-                print("saved")
+                save_preference(principle_id, questions_id, session['preference'], type='human')
                 # del session['preference']
                 # del session['justification']
                 alert = True
@@ -186,10 +192,11 @@ def login():
         'partition4': wo_r,
     }
     
-    preference = session.get('preference', None)
+    human_preference = session.get('preference', None)
+    machine_preference = session.get('machine_preference', None)
     justification = session.get('justification', None)
     
-    return render_template('index.html', partition_texts=partition_texts, index=session['index'], pid=principle_id, qid=questions_id, preference=preference, justification=justification, alert=alert)
+    return render_template('index.html', partition_texts=partition_texts, index=session['index'], pid=principle_id, qid=questions_id, human_preference=human_preference, machine_preference=machine_preference, justification=justification, alert=alert)
 
 if __name__ == "__main__":
     app.run(debug=True)

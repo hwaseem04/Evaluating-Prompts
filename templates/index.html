@@ -41,17 +41,17 @@
             </div>
         </div>
         <div id="preference">
-            {% if preference and justification %}
+            {% if human_preference and justification %}
                 <div>
-                    <strong>Preference:</strong> {{ preference }}<br>
+                    <strong>Preference:</strong> Human: {{ human_preference }}, Model: {{machine_preference}}<br>
                     <strong>Justification:</strong> {{ justification }}
                 </div>
             {% endif %}
         </div>
         <div id="options">
             <form method="POST" action="{{ url_for('login') }}">
-                <button type="submit" name="getPref" class="option-button">Get Preference</button>
-                <button type="submit" name="changePref" class="option-button">Change Preference</button>
+                <button type="submit" name="getPref" class="option-button">Get Model Preference</button>
+                <button type="submit" name="changePref" class="option-button">Change Human Preference</button>
                 <button type="submit" name="getCorr" class="option-button">Get Correctness</button>
                 <button type="submit" name="changeCorr" class="option-button">Change Correctness</button>
                 <button type="submit" name="prev" class="option-button">Previous</button>
