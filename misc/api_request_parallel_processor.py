@@ -1,3 +1,6 @@
+### CREDITS
+# Code taken directly from openAI repository
+
 """
 API REQUEST PARALLEL PROCESSOR
 
