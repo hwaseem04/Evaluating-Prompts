@@ -71,14 +71,17 @@ def get_preference(principle_id, questions_id):
     result1 = c.fetchone()
     c.execute(f"SELECT machine_preference FROM {table_name} WHERE qid=?", (questions_id,))
     result2 = c.fetchone()
+    c.execute(f"SELECT machine_pref_justification FROM {table_name} WHERE qid=?", (questions_id,))
+    result3 = c.fetchone()
     conn.close()
     
-    tup = [None, None]
+    tup = [None, None, None]
     print(type(result1[0]), type(result2[0]))
     if isinstance(result1[0], int):
         tup[0] = result1[0]
     if isinstance(result2[0], int):
         tup[1] = result2[0]
+        tup[2] = result3[0]
     return tup
 
 def save_preference(principle_id, questions_id, preference, type='human'):
@@ -111,10 +114,10 @@ def login():
             
             principle_id = rows[session['index']][0]   # Get the current principle_id
             questions_id = rows[session['index']][1]   # Get the current question_id
-            existing_human_preference, existing_machine_preference = get_preference(principle_id, questions_id)
+            existing_human_preference, existing_machine_preference, justification = get_preference(principle_id, questions_id)
             session['machine_preference'] = existing_machine_preference
             session['preference'] = existing_human_preference
-            session['justification'] = 'Loaded from database'
+            session['justification'] = justification
         
         elif 'prev' in request.form:
             session['index'] -= 1
@@ -122,11 +125,11 @@ def login():
                 session['index'] = len(rows) - 1  # Go to the last row if the index goes below 0
             principle_id = rows[session['index']][0]   # Get the current principle_id
             questions_id = rows[session['index']][1]   # Get the current question_id
-            existing_human_preference, existing_machine_preference = get_preference(principle_id, questions_id)
+            existing_human_preference, existing_machine_preference, justification = get_preference(principle_id, questions_id)
             
             session['machine_preference'] = existing_machine_preference
             session['preference'] = existing_human_preference
-            session['justification'] = 'Loaded from database'
+            session['justification'] = justification
         
         elif 'getPref' in request.form:
             response1 = rows[session['index']][4]
@@ -145,14 +148,14 @@ def login():
         elif 'changePref' in request.form:
             principle_id = rows[session['index']][0]   # Get the current principle_id
             questions_id = rows[session['index']][1]   # Get the current question_id
-            existing_human_preference, _ = get_preference(principle_id, questions_id)
+            existing_human_preference, _, justification = get_preference(principle_id, questions_id)
             # print('pref', existing_preference, type(existing_preference), 'qid :', questions_id)
             if 'preference' in session:
                 session['preference'] = 2 if session['preference'] == 1 else 1
-                session['justification'] = "Human Preference"
+                session['justification'] = justification
             elif existing_human_preference is not None:
                 session['preference'] = 2 if existing_human_preference == 1 else 1
-                session['justification'] = "Human Preference"
+                session['justification'] = justification
             
         
         elif 'getCorr' in request.form:
