@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 misc/json_files/
+misc/DBs/
+*.jsonl
+
 
 # C extensions
 *.so
