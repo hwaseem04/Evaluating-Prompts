@@ -76,7 +76,7 @@ def get_preference(principle_id, questions_id):
     conn.close()
     
     tup = [None, None, None]
-    print(type(result1[0]), type(result2[0]))
+    # print(type(result1[0]), type(result2[0]))
     if isinstance(result1[0], int):
         tup[0] = result1[0]
     if isinstance(result2[0], int):
@@ -141,20 +141,32 @@ def login():
             preference, justification = generate_preference(response1, response2)
             save_preference(principle_id, questions_id, preference, type='machine')
 
-            print('machine preference :', preference)
+            # print('machine preference :', preference)
             session['machine_preference'] = preference
             session['justification'] = justification
         
         elif 'changePref' in request.form:
-            principle_id = rows[session['index']][0]   # Get the current principle_id
-            questions_id = rows[session['index']][1]   # Get the current question_id
+            principle_id = rows[session['index']][0]  # Get the current principle_id
+            questions_id = rows[session['index']][1]  # Get the current question_id
             existing_human_preference, _, justification = get_preference(principle_id, questions_id)
-            # print('pref', existing_preference, type(existing_preference), 'qid :', questions_id)
+            
+            # Check if preference exists in session
             if 'preference' in session:
-                session['preference'] = 2 if session['preference'] == 1 else 1
+                if session['preference'] == 1:
+                    session['preference'] = 2
+                elif session['preference'] == 2:
+                    session['preference'] = 0
+                else:
+                    session['preference'] = 1
                 session['justification'] = justification
+            # If preference does not exist in session, check existing_human_preference
             elif existing_human_preference is not None:
-                session['preference'] = 2 if existing_human_preference == 1 else 1
+                if existing_human_preference == 1:
+                    session['preference'] = 2
+                elif existing_human_preference == 2:
+                    session['preference'] = 0
+                else:
+                    session['preference'] = 1
                 session['justification'] = justification
             
         
@@ -198,8 +210,8 @@ def login():
     human_preference = session.get('preference', None)
     machine_preference = session.get('machine_preference', None)
     justification = session.get('justification', None)
-    
-    return render_template('index.html', partition_texts=partition_texts, index=session['index'], pid=principle_id, qid=questions_id, human_preference=human_preference, machine_preference=machine_preference, justification=justification, alert=alert)
+    # print('human preference :',  human_preference)
+    return render_template('index.html', partition_texts=partition_texts, index=session['index'], pid=principle_id, qid=questions_id, human_preference=str(human_preference), machine_preference=machine_preference, justification=justification, alert=alert)
 
 if __name__ == "__main__":
     app.run(debug=True)
