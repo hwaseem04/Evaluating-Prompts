@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.secret_key = "text123" # supposed to be taken from the environment variable. But for now, its okay.
 db_path = './misc/DBs/principles.db'
 
-client = OpenAI(api_key='sk-proj-tmR5ExbMdnZeFVs7OgH7T3BlbkFJLwrPmPTMiznz6IZJQBuA')
+client = OpenAI(api_key='api_key')
 
 def get_all_rows():
     conn = sqlite3.connect(db_path)
